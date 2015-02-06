@@ -1,0 +1,12 @@
+description	"tasseo"
+
+start on (local-filesystems and net-device-up IFACE!=lo)
+stop on shutdown
+
+respawn
+setuid tasseo
+chdir {{ tasseo_dir }}/tasseo-{{ tasseo_version }}
+
+env GRAPHITE_URL={{ tasseo_graphite_url }}
+
+exec bundle exec rackup -I lib -p {{ tasseo_port }} -s thin >> {{ tasseo_log }} 2>&1

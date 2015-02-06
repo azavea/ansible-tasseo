@@ -1,0 +1,51 @@
+---
+- name: Create service account for Tasseo
+  user: name=tasseo
+        system=yes
+        home=/var/lib/tasseo
+        shell=/bin/false
+        state=present
+
+- name: Download Tasseo
+  get_url: url=https://github.com/obfuscurity/tasseo/archive/v{{ tasseo_version }}.tar.gz
+           dest=/usr/local/src/tasseo-v{{ tasseo_version }}.tar.gz
+
+- name: Extract and install Tasseo
+  unarchive: src=/usr/local/src/tasseo-v{{ tasseo_version }}.tar.gz
+             dest={{ tasseo_dir }}
+             copy=no
+             creates={{ tasseo_dir }}/tasseo-{{ tasseo_version }}
+
+- name: Ensure that Tasseo user owns Tasseo directory
+  file: path="{{ tasseo_dir }}/tasseo-{{ tasseo_version }}"
+        owner=tasseo
+        group=tasseo
+        recurse=yes
+        state=directory
+
+- name: Install Bundler
+  gem: name=bundler
+       user_install=no
+       state=present
+
+- name: Install Tasseo dependencies
+  sudo_user: tasseo
+  command: bundle install --deployment --jobs=3 --retry=3
+  args:
+    chdir: "{{ tasseo_dir }}/tasseo-{{ tasseo_version }}"
+    creates: vendor/bundle
+
+- name: Configure Tasseo service definition
+  template: src=tasseo.conf.j2 dest=/etc/init/tasseo.conf
+  notify:
+    - Restart Tasseo
+
+- name: Touch log file if it does not exist
+  command: touch {{ tasseo_log }}
+           creates={{ tasseo_log }}
+
+- name: Set log file permissions
+  file: path={{ tasseo_log }} owner=tasseo group=tasseo mode=0644
+
+- name: Configure Tasseo log rotation
+  template: src=logrotate_tasseo.j2 dest=/etc/logrotate.d/tasseo

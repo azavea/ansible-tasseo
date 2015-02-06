@@ -1,0 +1,7 @@
+{{ tasseo_log }} {
+  rotate {{ tasseo_log_rotate_count }}
+  {{ tasseo_log_rotate_interval }}
+  compress
+  missingok
+  notifempty
+}

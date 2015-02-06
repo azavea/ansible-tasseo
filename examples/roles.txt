@@ -1,0 +1,2 @@
+azavea.ruby,0.3.0
+azavea.build-essential,0.1.0

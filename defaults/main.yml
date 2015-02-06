@@ -1,0 +1,9 @@
+---
+tasseo_version: "0.1.0"
+tasseo_dir: "/opt"
+tasseo_port: 5000
+tasseo_graphite_url: "http://localhost"
+
+tasseo_log: /var/log/tasseo.log
+tasseo_log_rotate_count: 5
+tasseo_log_rotate_interval: daily
