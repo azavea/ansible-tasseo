@@ -7,6 +7,8 @@ respawn
 setuid tasseo
 chdir {{ tasseo_dir }}/tasseo-{{ tasseo_version }}
 
-env GRAPHITE_URL={{ tasseo_graphite_url }}
+script
+  export GRAPHITE_URL="{{ tasseo_graphite_url }}"
 
-exec bundle exec rackup -I lib -p {{ tasseo_port }} -s thin >> {{ tasseo_log }} 2>&1
+  exec bundle exec rackup -I lib -p {{ tasseo_port }} -s thin >> {{ tasseo_log }} 2>&1
+end script
